@@ -7,8 +7,6 @@
 
     <title>Hostel Management System - Find Your Perfect Accommodation</title>
 
-
-
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -34,6 +32,37 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        /* Gradient animation for video overlay */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Ensure video covers the entire section */
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.object-cover {
+    object-fit: cover;
+}
+
+/* Video container aspect ratio */
+.aspect-video {
+    aspect-ratio: 16 / 9;
+}
     </style>
 </head>
 <body class="bg-white">
@@ -50,99 +79,74 @@
                         <span class="ml-2 text-xl font-bold text-gray-900">HostelHub</span>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <a href="#features" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">Features</a>
-                    <a href="#how-it-works" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">How It Works</a>
-                    <a href="#testimonials" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">Testimonials</a>
-                    <a href="{{ route('login') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">Sign In</a>
-                    <a href="{{ route('register') }}" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 text-sm font-medium">Sign Up</a>
+<div class="flex items-center space-x-4">
+    <a href="#features" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">Features</a>
+    <a href="#how-it-works" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">How It Works</a>
+    <a href="#testimonials" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium">Testimonials</a>
+
+    @auth
+        @if(auth()->user()->isAdmin())
+            <a href="{{ route('admin.dashboard') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">Admin Dashboard</a>
+        @else
+            <a href="{{ route('dashboard') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">Dashboard</a>
+        @endif
+        <form method="POST" action="{{ route('logout') }}" class="inline">
+            @csrf
+            <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 text-sm font-medium">Logout</button>
+        </form>
+        @else
+        <a href="{{ route('login') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">Sign In</a>
+        <a href="{{ route('register') }}" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 text-sm font-medium">Sign Up</a>
+                    @endauth
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient pt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="text-white">
-                    <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                        Find Your Perfect
-                        <span class="text-yellow-300">Student Hostel</span>
-                    </h1>
-                    <p class="text-xl mb-8 text-blue-100 leading-relaxed">
-                        Discover comfortable, affordable, and secure accommodations tailored for students.
-                        Join thousands of students who found their home away from home with us.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="{{ route('register') }}"
-                           class="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 font-semibold text-lg text-center transition duration-300">
-                            🏠 Find Your Hostel
-                        </a>
-                        <a href="#features"
-                           class="border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-blue-600 font-semibold text-lg text-center transition duration-300">
-                            Learn More
-                        </a>
-                    </div>
-                    <div class="mt-8 flex items-center space-x-6 text-blue-100">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span>Verified Hostels</span>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span>Secure Payments</span>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span>24/7 Support</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="relative">
-                    <div class="bg-white rounded-2xl p-6 shadow-2xl">
-                        <div class="bg-gray-100 rounded-lg p-4 mb-4">
-                            <div class="flex space-x-2 mb-3">
-                                <div class="w-3 h-3 bg-red-400 rounded-full"></div>
-                                <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                                <div class="w-3 h-3 bg-green-400 rounded-full"></div>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                                    <span class="text-gray-600">📍 Location</span>
-                                    <span class="font-semibold">Near Campus</span>
-                                </div>
-                                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                                    <span class="text-gray-600">💰 Price</span>
-                                    <span class="font-semibold text-green-600">KSh 5,000/month</span>
-                                </div>
-                                <div class="flex justify-between items-center p-3 bg-white rounded border">
-                                    <span class="text-gray-600">⭐ Rating</span>
-                                    <span class="font-semibold text-yellow-500">4.8/5</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <p class="text-gray-600 mb-2">Join 10,000+ students already using HostelHub</p>
-                            <div class="flex justify-center space-x-1">
-                                @for($i = 0; $i < 5; $i++)
-                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                @endfor
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- Replace the entire Hero Section with this: -->
+<section class="relative pt-16 h-screen flex items-center justify-center overflow-hidden">
+    <!-- Video Background -->
+    <div class="absolute inset-0 z-0">
+        <video
+            autoplay
+            muted
+            loop
+            playsinline
+            class="w-full h-full object-cover"
+            poster="{{ asset('images/video-poster.jpg') }}"
+        >
+            <source src="{{ asset('videos/welcome-video.mp4') }}" type="video/mp4">
+            <source src="{{ asset('videos/welcome-video.webm') }}" type="video/webm">
+            <!-- Fallback image if video doesn't load -->
+            <div class="hero-gradient absolute inset-0"></div>
+        </video>
+        <!-- Overlay for better text readability -->
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            Find Your Perfect
+            <span class="text-yellow-300">Student Hostel</span>
+        </h1>
+        <p class="text-xl mb-8 text-blue-100 leading-relaxed max-w-3xl mx-auto">
+            Discover comfortable, affordable, and secure accommodations tailored for students.
+            Join thousands of students who found their home away from home with us.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ route('register') }}"
+               class="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 font-semibold text-lg text-center transition duration-300">
+                🏠 Find Your Hostel
+            </a>
+            <button onclick="playIntroVideo()"
+               class="border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-blue-600 font-semibold text-lg text-center transition duration-300 flex items-center justify-center">
+                ▶ Watch Intro
+            </button>
         </div>
-    </section>
+    </div>
+</section>
+
 
     <!-- Stats Section -->
     <section class="bg-white py-16">
@@ -369,29 +373,64 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="hero-gradient py-20">
-        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
-                Ready to Find Your Perfect Hostel?
-            </h2>
-            <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-                Join thousands of students who have found their ideal accommodation through HostelHub.
-                Start your search today!
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('register') }}"
-                   class="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 font-semibold text-lg transition duration-300">
-                    Get Started Free
-                </a>
-                <a href="{{ route('login') }}"
-                   class="border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-blue-600 font-semibold text-lg transition duration-300">
-                    Sign In
-                </a>
-            </div>
-            <p class="text-blue-100 mt-4">No credit card required • Free forever for students</p>
-        </div>
-    </section>
+    <!-- CTA Section with Background Video -->
+<section class="relative py-20 overflow-hidden">
+    <!-- Video Background -->
+    <div class="absolute inset-0 z-0">
+        <video
+            autoplay
+            muted
+            loop
+            playsinline
+            class="w-full h-full object-cover"
+            poster="{{ asset('images/cta-video-poster.jpg') }}"
+        >
+            <source src="{{ asset('videos/cta-background.mp4') }}" type="video/mp4">
+            <source src="{{ asset('videos/cta-background.webm') }}" type="video/webm">
+            <!-- Fallback gradient if video doesn't load -->
+            <div class="hero-gradient absolute inset-0"></div>
+        </video>
+        <!-- Overlay for better text readability -->
+        <div class="absolute inset-0 bg-blue-900 bg-opacity-70"></div>
+        <!-- Optional: Animated gradient overlay for extra visual appeal -->
+        <div class="absolute inset-0 opacity-30" style="background: linear-gradient(45deg, #667eea 0%, #764ba2 50%, #667eea 100%); background-size: 400% 400%; animation: gradientShift 15s ease infinite;"></div>
+    </div>
 
+    <!-- Content -->
+    <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to Find Your Perfect Hostel?
+        </h2>
+        <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of students who have found their ideal accommodation through HostelHub.
+            Start your search today!
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ route('register') }}"
+               class="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 font-semibold text-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                🏠 Get Started Free
+            </a>
+            <a href="{{ route('login') }}"
+               class="border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-blue-600 font-semibold text-lg transition duration-300 transform hover:scale-105">
+                Sign In
+            </a>
+        </div>
+        <p class="text-blue-100 mt-4">No credit card required • Free forever for students</p>
+
+        <!-- Optional: Add a play button for sound -->
+        <div class="mt-6">
+            <button id="unmuteButton" class="text-white bg-black bg-opacity-30 hover:bg-opacity-50 rounded-full p-3 transition duration-300 flex items-center space-x-2 mx-auto text-sm">
+                <svg id="muteIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+                <svg id="unmuteIcon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                </svg>
+                <span id="unmuteText">Enable Sound</span>
+            </button>
+        </div>
+    </div>
+</section>
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -441,6 +480,82 @@
     </footer>
 
     <script>
+            // Video Sound Control
+    document.addEventListener('DOMContentLoaded', function() {
+        const unmuteButton = document.getElementById('unmuteButton');
+        const muteIcon = document.getElementById('muteIcon');
+        const unmuteIcon = document.getElementById('unmuteIcon');
+        const unmuteText = document.getElementById('unmuteText');
+        let video = document.querySelector('.hero-gradient + video');
+
+        if (!video) {
+            // Fallback: get any video in the CTA section
+            video = document.querySelector('section:has(.hero-gradient) video');
+        }
+
+        if (unmuteButton && video) {
+            unmuteButton.addEventListener('click', function() {
+                if (video.muted) {
+                    // Unmute video
+                    video.muted = false;
+                    muteIcon.classList.add('hidden');
+                    unmuteIcon.classList.remove('hidden');
+                    unmuteText.textContent = 'Sound On';
+                    unmuteButton.classList.add('bg-green-500', 'bg-opacity-50');
+                    unmuteButton.classList.remove('bg-black', 'bg-opacity-30');
+                } else {
+                    // Mute video
+                    video.muted = true;
+                    muteIcon.classList.remove('hidden');
+                    unmuteIcon.classList.add('hidden');
+                    unmuteText.textContent = 'Enable Sound';
+                    unmuteButton.classList.remove('bg-green-500', 'bg-opacity-50');
+                    unmuteButton.classList.add('bg-black', 'bg-opacity-30');
+                }
+            });
+        }
+    });
+        // Video modal functionality
+function openVideoModal() {
+    const modal = document.getElementById('videoModal');
+    const video = document.getElementById('modalVideo');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    video.play();
+}
+
+function closeVideo() {
+    const modal = document.getElementById('videoModal');
+    const video = document.getElementById('modalVideo');
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    video.pause();
+    video.currentTime = 0;
+}
+
+// Inline video play function
+function playVideo() {
+    const video = document.getElementById('introVideo');
+    const overlay = document.getElementById('videoOverlay');
+    video.play();
+    overlay.style.display = 'none';
+}
+
+// Close modal when clicking outside
+document.getElementById('videoModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeVideo();
+    }
+});
+
+// Escape key to close modal
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeVideo();
+    }
+});
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {

@@ -27,7 +27,7 @@ public function dashboard()
         'pending_requests' => ServiceRequest::where('service_provider_id', $serviceProvider->id)
             ->where('status', ServiceRequest::STATUS_PENDING)->count(),
         'active_jobs' => ServiceRequest::where('service_provider_id', $serviceProvider->id)
-            ->whereIn('status', [ServiceRequest::STATUS_ACCEPTED, ServiceRequest::STATUS_IN_PROGRESS])->count(),
+            ->whereIn('status', [ServiceRequest::STATUS_ASSIGNED, ServiceRequest::STATUS_IN_PROGRESS])->count(),
         'completed_jobs' => ServiceRequest::where('service_provider_id', $serviceProvider->id)
             ->where('status', ServiceRequest::STATUS_COMPLETED)->count(),
         'total_earnings' => ServiceRequest::where('service_provider_id', $serviceProvider->id)
@@ -44,7 +44,7 @@ public function dashboard()
 
     $upcomingJobs = ServiceRequest::with(['student', 'hostel'])
         ->where('service_provider_id', $serviceProvider->id)
-        ->whereIn('status', [ServiceRequest::STATUS_ACCEPTED, ServiceRequest::STATUS_IN_PROGRESS])
+        ->whereIn('status', [ServiceRequest::STATUS_ASSIGNED, ServiceRequest::STATUS_IN_PROGRESS])
         ->where('scheduled_date', '>=', now())
         ->orderBy('scheduled_date')
         ->limit(5)
@@ -157,29 +157,84 @@ public function dashboard()
         return back()->with('success', 'Job completed successfully!');
     }
 
-    public function profile()
-    {
-        $serviceProvider = Auth::user()->serviceProvider;
-        return view('service-provider.profile', compact('serviceProvider'));
-    }
+  // app/Http/Controllers/ServiceProviderController.php
+public function profile()
+{
+    $user = auth()->user();
+    $serviceProvider = $user->serviceProvider;
 
-    public function updateProfile(Request $request)
-    {
-        $serviceProvider = Auth::user()->serviceProvider;
+    // If service provider doesn't exist, you might want to create one
+    if (!$serviceProvider) {
+        // Option 1: Redirect to create profile page
+        // return redirect()->route('service-provider.create-profile');
 
-        $request->validate([
-            'company_name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'hourly_rate' => 'required|numeric|min:0',
-            'license_number' => 'nullable|string|max:255'
+        // Option 2: Create a basic service provider record
+        $serviceProvider = ServiceProvider::create([
+            'user_id' => $user->id,
+            'business_name' => $user->name,
+            'is_verified' => false,
         ]);
-
-        $serviceProvider->update($request->only([
-            'company_name', 'description', 'hourly_rate', 'license_number'
-        ]));
-
-        return back()->with('success', 'Profile updated successfully!');
     }
+
+    return view('service-provider.profile', [
+        'user' => $user,
+        'serviceProvider' => $serviceProvider
+    ]);
+}
+
+// app/Http/Controllers/ServiceProviderController.php
+public function updateProfile(Request $request)
+{
+    $user = auth()->user();
+    $serviceProvider = $user->serviceProvider;
+
+    // Validate user fields
+    $userValidated = $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
+    ]);
+
+    // Update user
+    $user->update([
+        'name' => $userValidated['name'],
+        'phone' => $userValidated['phone'],
+    ]);
+
+    // Validate service provider fields based on your model's fillable array
+    $providerValidated = $request->validate([
+        'company_name' => 'required|string|max:255',
+        'service_type' => 'required|string',
+        'description' => 'required|string',
+        'license_number' => 'required|string|max:255',
+        'experience_years' => 'required|integer|min:0|max:50',
+        'hourly_rate' => 'required|numeric|min:0',
+        'coverage_areas' => 'nullable|string',
+        'response_time' => 'required|integer|min:1|max:48',
+    ]);
+
+    // Handle coverage_areas - convert from comma-separated string to array
+    $coverageAreas = [];
+    if (!empty($providerValidated['coverage_areas'])) {
+        $coverageAreas = array_map('trim', explode(',', $providerValidated['coverage_areas']));
+    }
+
+    // Update service provider
+    $serviceProvider->update([
+        'company_name' => $providerValidated['company_name'],
+        'service_type' => $providerValidated['service_type'],
+        'description' => $providerValidated['description'],
+        'license_number' => $providerValidated['license_number'],
+        'experience_years' => $providerValidated['experience_years'],
+        'hourly_rate' => $providerValidated['hourly_rate'],
+        'coverage_areas' => $coverageAreas,
+        'response_time' => $providerValidated['response_time'],
+        // Note: is_verified, is_available, rating, etc. are not updated here
+        // as they are managed by admin/system
+    ]);
+
+    return redirect()->route('service-provider.profile')
+        ->with('success', 'Profile updated successfully!');
+}
     // Add these methods to your existing ServiceProviderController
 
 public function earnings()

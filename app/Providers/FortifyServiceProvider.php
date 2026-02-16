@@ -2,47 +2,59 @@
 
 namespace App\Providers;
 
-use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
-use App\Actions\Fortify\UpdateUserPassword;
-use App\Actions\Fortify\UpdateUserProfileInformation;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
+    public function boot()
     {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        Fortify::createUsersUsing(CreateNewUser::class);
-        Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
-        Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
-        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
-        Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
-
-        RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
-
-            return Limit::perMinute(5)->by($throttleKey);
+        // Override where to redirect after login
+        Fortify::loginView(function () {
+            return view('auth.login');
         });
 
-        RateLimiter::for('two-factor', function (Request $request) {
-            return Limit::perMinute(5)->by($request->session()->get('login.id'));
+        // Register the password reset action
+        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+
+        // Override login response
+        $this->app->singleton(\Laravel\Fortify\Contracts\LoginResponse::class, function () {
+            return new class implements \Laravel\Fortify\Contracts\LoginResponse {
+                public function toResponse($request)
+                {
+                    $user = Auth::user();
+
+                    // Check if user is approved and active
+                    if (!$user->is_approved) {
+                        Auth::logout();
+                        return redirect()->route('login')
+                            ->with('error', 'Your account is pending approval. Please contact administrator.');
+                    }
+
+                    if (!$user->is_active) {
+                        Auth::logout();
+                        return redirect()->route('login')
+                            ->with('error', 'Your account has been suspended. Please contact administrator.');
+                    }
+
+                    // Redirect based on user type
+                    switch ($user->user_type) {
+                        case 'landlord':
+                            return redirect()->route('landlord.dashboard');
+                        case 'student':
+                            return redirect()->route('student.dashboard');
+                        case 'service_provider':
+                            return redirect()->route('service-provider.dashboard');
+                        case 'admin':
+                            return redirect()->route('dashboard');
+                        default:
+                            return redirect('/');
+                    }
+                }
+            };
         });
     }
 }

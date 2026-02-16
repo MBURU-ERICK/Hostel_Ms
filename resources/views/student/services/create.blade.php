@@ -8,6 +8,7 @@
     <title>New Service Request - HostelHub</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 <body class="bg-gray-100">
     <!-- Navigation -->
@@ -23,15 +24,59 @@
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-700">{{ Auth::user()->name }}</span>
+                    <span class="text-sm text-gray-700">Welcome, {{ Auth::user()->name }}</span>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="text-sm text-gray-500 hover:text-gray-700 bg-gray-100 px-3 py-1 rounded">
+                            Logout
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="min-h-screen py-8">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Sidebar and Main Content -->
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-sm min-h-screen">
+            <nav class="mt-8">
+                <div class="px-4 space-y-2">
+                    <a href="{{ route('student.dashboard') }}"
+                       class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="{{ route('student.services.index') }}"
+                       class="flex items-center px-4 py-3 text-gray-700 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Maintenance Services
+                    </a>
+                    <a href="{{ route('student.my-bookings') }}"
+                       class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        My Bookings
+                    </a>
+                    <a href="{{ route('student.messages') }}"
+                       class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        Messages
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
             <!-- Header -->
             <div class="mb-8">
                 <a href="{{ route('student.services.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
@@ -43,6 +88,19 @@
                 <h1 class="text-3xl font-bold text-gray-900">New Service Request</h1>
                 <p class="text-gray-600 mt-2">Fill out the form below to request maintenance services</p>
             </div>
+
+            <!-- Display Success/Error Messages -->
+            @if(session('success'))
+                <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline">{{ session('error') }}</span>
+                </div>
+            @endif
 
             <!-- Service Request Form -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -60,7 +118,7 @@
                                 Service Type *
                             </label>
                             <select id="service_type" name="service_type" required
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 @error('service_type') border-red-500 @enderror">
                                 <option value="">Select a service type</option>
                                 @foreach($serviceTypes as $key => $value)
                                     <option value="{{ $key }}" {{ old('service_type') == $key ? 'selected' : '' }}>
@@ -79,7 +137,7 @@
                                 Hostel *
                             </label>
                             <select id="hostel_id" name="hostel_id" required
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 @error('hostel_id') border-red-500 @enderror">
                                 <option value="">Select your hostel</option>
                                 @foreach($hostels as $hostel)
                                     <option value="{{ $hostel->id }}" {{ old('hostel_id') == $hostel->id ? 'selected' : '' }}>
@@ -99,7 +157,7 @@
                             </label>
                             <input type="text" id="title" name="title" value="{{ old('title') }}" required
                                 placeholder="Brief description of the issue"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 @error('title') border-red-500 @enderror">
                             @error('title')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -112,7 +170,7 @@
                             </label>
                             <textarea id="description" name="description" rows="4" required
                                 placeholder="Please provide detailed information about the issue..."
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">{{ old('description') }}</textarea>
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
                             @error('description')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -120,7 +178,7 @@
 
                         <!-- Urgency Level -->
                         <div>
-                            <label for="urgency_level" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Urgency Level *
                             </label>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -174,7 +232,7 @@
                                 </label>
                                 <input type="text" id="address" name="address" value="{{ old('address') }}" required
                                     placeholder="Hostel address and location details"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 @error('address') border-red-500 @enderror">
                                 @error('address')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -186,7 +244,7 @@
                                 </label>
                                 <input type="text" id="room_number" name="room_number" value="{{ old('room_number') }}" required
                                     placeholder="Your room number"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 @error('room_number') border-red-500 @enderror">
                                 @error('room_number')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror

@@ -8,12 +8,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->enum('user_type', ['student', 'landlord', 'service_provider'])->default('student');
-            $table->boolean('is_approved')->default(false);
-            $table->string('phone')->nullable();
-        });
-
         Schema::create('student_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -33,8 +27,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('student_profiles');
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['user_type', 'is_approved', 'phone']);
-        });
     }
 };

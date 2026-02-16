@@ -6,10 +6,12 @@ use App\Models\Hostel;
 use App\Models\Booking;
 use App\Models\Message;
 use App\Models\Review;
+use App\Models\Payment;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\View\View;
 
 class LandlordController extends Controller
 {
@@ -38,6 +40,9 @@ class LandlordController extends Controller
                 : 0,
         ];
 
+        // Add payment statistics
+        $paymentStats = $this->getPaymentStats($hostelIds);
+
         $recentBookings = $hostelIds->isNotEmpty()
             ? Booking::with(['hostel', 'student'])
                 ->whereIn('hostel_id', $hostelIds)
@@ -57,7 +62,278 @@ class LandlordController extends Controller
                 ->get()
             : collect();
 
-        return view('landlord.dashboard', compact('stats', 'recentBookings', 'recentMessages', 'hostels'));
+        // Add recent payments
+        $recentPayments = $hostelIds->isNotEmpty()
+            ? Payment::with(['user', 'booking'])
+                ->whereHas('booking', function($query) use ($hostelIds) {
+                    $query->whereIn('hostel_id', $hostelIds);
+                })
+                ->where('status', 'successful')
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get()
+            : collect();
+
+        return view('landlord.dashboard', compact(
+            'stats', 
+            'paymentStats', 
+            'recentBookings', 
+            'recentMessages', 
+            'recentPayments', 
+            'hostels'
+        ));
+    }
+
+    /**
+     * Get payment statistics for landlord dashboard
+     */
+    private function getPaymentStats($hostelIds)
+    {
+        if ($hostelIds->isEmpty()) {
+            return [
+                'total_payments' => 0,
+                'successful_payments' => 0,
+                'pending_payments' => 0,
+                'total_received' => 0,
+                'this_month_received' => 0,
+                'last_payment' => null,
+                'average_payment' => 0,
+            ];
+        }
+
+        try {
+            $paymentStats = [
+                'total_payments' => Payment::whereHas('booking', function($query) use ($hostelIds) {
+                        $query->whereIn('hostel_id', $hostelIds);
+                    })->count(),
+                'successful_payments' => Payment::whereHas('booking', function($query) use ($hostelIds) {
+                        $query->whereIn('hostel_id', $hostelIds);
+                    })->where('status', 'successful')->count(),
+                'pending_payments' => Payment::whereHas('booking', function($query) use ($hostelIds) {
+                        $query->whereIn('hostel_id', $hostelIds);
+                    })->where('status', 'pending')->count(),
+                'total_received' => Payment::whereHas('booking', function($query) use ($hostelIds) {
+                        $query->whereIn('hostel_id', $hostelIds);
+                    })->where('status', 'successful')->sum('amount') ?? 0,
+                'this_month_received' => Payment::whereHas('booking', function($query) use ($hostelIds) {
+                        $query->whereIn('hostel_id', $hostelIds);
+                    })
+                    ->where('status', 'successful')
+                    ->whereMonth('completed_at', now()->month)
+                    ->whereYear('completed_at', now()->year)
+                    ->sum('amount') ?? 0,
+                'last_payment' => Payment::whereHas('booking', function($query) use ($hostelIds) {
+                        $query->whereIn('hostel_id', $hostelIds);
+                    })
+                    ->where('status', 'successful')
+                    ->latest()
+                    ->first(),
+                'average_payment' => Payment::whereHas('booking', function($query) use ($hostelIds) {
+                        $query->whereIn('hostel_id', $hostelIds);
+                    })
+                    ->where('status', 'successful')
+                    ->avg('amount') ?? 0,
+            ];
+
+            // Format amounts
+            $paymentStats['formatted_total_received'] = 'KSh ' . number_format($paymentStats['total_received'], 2);
+            $paymentStats['formatted_month_received'] = 'KSh ' . number_format($paymentStats['this_month_received'], 2);
+            $paymentStats['formatted_average_payment'] = 'KSh ' . number_format($paymentStats['average_payment'], 2);
+
+            return $paymentStats;
+
+        } catch (\Exception $e) {
+            \Log::error('Error getting landlord payment stats: ' . $e->getMessage());
+            
+            return [
+                'total_payments' => 0,
+                'successful_payments' => 0,
+                'pending_payments' => 0,
+                'total_received' => 0,
+                'this_month_received' => 0,
+                'formatted_total_received' => 'KSh 0.00',
+                'formatted_month_received' => 'KSh 0.00',
+                'formatted_average_payment' => 'KSh 0.00',
+                'last_payment' => null,
+                'average_payment' => 0,
+            ];
+        }
+    }
+
+    // ... existing methods ...
+/**
+ * Show payments/earnings for landlord
+ */
+public function payments(Request $request)
+    {
+        $hostelIds = Hostel::where('landlord_id', Auth::id())->pluck('id');
+
+   
+        $query = Payment::with(['user', 'booking.hostel'])
+            ->whereHas('booking', function($q) use ($hostelIds) {
+                $q->whereIn('hostel_id', $hostelIds);
+            })
+            ->where('status', 'successful'); // Only show successful payments
+
+        // Filter by date range
+        if ($request->has('period')) {
+            switch($request->period) {
+                case 'today':
+                    $query->whereDate('completed_at', today());
+                    break;
+                case 'week':
+                    $query->whereBetween('completed_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                    break;
+                case 'month':
+                    $query->whereMonth('completed_at', now()->month)
+                          ->whereYear('completed_at', now()->year);
+                    break;
+                case 'year':
+                    $query->whereYear('completed_at', now()->year);
+                    break;
+            }
+        }
+
+        // Filter by hostel
+        if ($request->has('hostel_id') && $request->hostel_id !== 'all') {
+            $query->whereHas('booking', function($q) use ($request) {
+                $q->where('hostel_id', $request->hostel_id);
+            });
+        }
+
+        $payments = $query->orderBy('completed_at', 'desc')->paginate(20)->withQueryString();
+
+        // Calculate statistics
+        $totalEarnings = Payment::whereHas('booking', function($q) use ($hostelIds) {
+                $q->whereIn('hostel_id', $hostelIds);
+            })
+            ->where('status', 'successful')
+            ->sum('amount') ?? 0;
+
+        $monthlyEarnings = Payment::whereHas('booking', function($q) use ($hostelIds) {
+                $q->whereIn('hostel_id', $hostelIds);
+            })
+            ->where('status', 'successful')
+            ->whereMonth('completed_at', now()->month)
+            ->whereYear('completed_at', now()->year)
+            ->sum('amount') ?? 0;
+
+        $weeklyEarnings = Payment::whereHas('booking', function($q) use ($hostelIds) {
+                $q->whereIn('hostel_id', $hostelIds);
+            })
+            ->where('status', 'successful')
+            ->whereBetween('completed_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->sum('amount') ?? 0;
+
+        $pendingPayouts = Payment::whereHas('booking', function($q) use ($hostelIds) {
+                $q->whereIn('hostel_id', $hostelIds);
+            })
+            ->where('status', 'pending')
+            ->sum('amount') ?? 0;
+
+        // Get hostels for filter dropdown
+        $hostels = Hostel::where('landlord_id', Auth::id())->get();
+
+        // Monthly earnings for chart
+        $monthlyData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $amount = Payment::whereHas('booking', function($q) use ($hostelIds) {
+                    $q->whereIn('hostel_id', $hostelIds);
+                })
+                ->where('status', 'successful')
+                ->whereYear('completed_at', $month->year)
+                ->whereMonth('completed_at', $month->month)
+                ->sum('amount') ?? 0;
+            
+            $monthlyData[] = [
+                'month' => $month->format('M Y'),
+                'amount' => $amount
+            ];
+        }
+
+        return view('landlord.payments.show', compact(
+            'payments',
+            'totalEarnings',
+            'monthlyEarnings',
+            'weeklyEarnings',
+            'pendingPayouts',
+            'hostels',
+            'monthlyData'
+        ));
+    }
+
+    /**
+     * Show individual payment details
+     */
+    public function showPayment($id): View
+    {
+        $payment = Payment::with(['user', 'booking.hostel'])
+            ->whereHas('booking.hostel', function($query) {
+                $query->where('landlord_id', Auth::id());
+            })
+            ->findOrFail($id);
+
+        return view('landlord.payments.show', compact('payment'));
+    }
+
+    /**
+     * Export payments as CSV
+     */
+    public function exportPayments(Request $request)
+    {
+        $hostelIds = Hostel::where('landlord_id', Auth::id())->pluck('id');
+
+        $query = Payment::with(['user', 'booking.hostel'])
+            ->whereHas('booking', function($q) use ($hostelIds) {
+                $q->whereIn('hostel_id', $hostelIds);
+            })
+            ->where('status', 'successful');
+
+        // Apply filters
+        if ($request->has('period')) {
+            switch($request->period) {
+                case 'today':
+                    $query->whereDate('completed_at', today());
+                    break;
+                case 'week':
+                    $query->whereBetween('completed_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                    break;
+                case 'month':
+                    $query->whereMonth('completed_at', now()->month)
+                          ->whereYear('completed_at', now()->year);
+                    break;
+            }
+        }
+
+        $payments = $query->orderBy('completed_at', 'desc')->get();
+
+        // Generate CSV
+        $filename = 'payments-' . now()->format('Y-m-d') . '.csv';
+        $handle = fopen('php://temp', 'w+');
+        
+        // Add headers
+        fputcsv($handle, ['Date', 'Student', 'Hostel', 'Booking ID', 'Amount', 'Transaction ID']);
+        
+        // Add data
+        foreach ($payments as $payment) {
+            fputcsv($handle, [
+                $payment->completed_at->format('Y-m-d H:i'),
+                $payment->user->name,
+                $payment->booking->hostel->name,
+                '#' . $payment->booking->id,
+                $payment->amount,
+                $payment->transaction_id ?? 'N/A'
+            ]);
+        }
+
+        rewind($handle);
+        $content = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($content)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 
     public function hostels()

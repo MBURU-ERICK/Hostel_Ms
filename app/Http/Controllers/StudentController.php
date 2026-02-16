@@ -276,4 +276,35 @@ public function notifications()
 
         return view('student.notifications', compact('notifications', 'unreadCount'));
     }
+    public function messages()
+    {
+        $user = Auth::user();
+
+        // Get all bookings where the student has messages
+        $bookingsWithMessages = Booking::where('user_id', $user->id)
+            ->whereHas('messages')
+            ->with(['hostel', 'messages' => function($query) {
+                $query->latest();
+            }])
+            ->latest()
+            ->get();
+
+        // Use the correct view that expects a collection of bookings
+        return view('student.messages', compact('bookingsWithMessages'));
+    }
+
+    /**
+     * Show messages for a specific booking
+     */
+    public function bookingMessages($bookingId)
+    {
+        $booking = Booking::where('user_id', Auth::id())
+            ->with(['hostel', 'messages.user'])
+            ->findOrFail($bookingId);
+
+        // This should use the view that expects a single $booking
+        return view('student.messages.index', compact('booking'));
+    }
+
+
 }

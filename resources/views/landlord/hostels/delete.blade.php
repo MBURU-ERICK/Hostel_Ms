@@ -42,42 +42,42 @@
         <div class="w-64 bg-white shadow-sm min-h-screen">
             <nav class="mt-8">
                 <div class="px-4 space-y-2">
-                    <a href="{{ route('landlord.dashboard') }}" 
+                    <a href="{{ route('landlord.dashboard') }}"
                        class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
                         Dashboard
                     </a>
-                    <a href="{{ route('landlord.hostels') }}" 
+                    <a href="{{ route('landlord.hostels') }}"
                        class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                         My Hostels
                     </a>
-                    <a href="{{ route('landlord.bookings') }}" 
+                    <a href="{{ route('landlord.bookings') }}"
                        class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         Bookings
                     </a>
-                    <a href="{{ route('landlord.messages') }}" 
+                    <a href="{{ route('landlord.messages.index') }}"
                        class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                         </svg>
                         Messages
                     </a>
-                    <a href="{{ route('landlord.reviews') }}" 
+                    <a href="{{ route('landlord.reviews') }}"
                        class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
                         </svg>
                         Reviews
                     </a>
-                    <a href="{{ route('landlord.earnings') }}" 
+                    <a href="{{ route('landlord.earnings') }}"
                        class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
@@ -97,7 +97,7 @@
                         <h1 class="text-3xl font-bold text-gray-900">Delete Hostel</h1>
                         <p class="text-gray-600 mt-2">Confirm deletion of hostel: <strong>{{ $hostel->name }}</strong></p>
                     </div>
-                    <a href="{{ route('landlord.hostels') }}" 
+                    <a href="{{ route('landlord.hostels') }}"
                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -124,7 +124,7 @@
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
                 <div class="p-6 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Hostel Information</h3>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <h4 class="font-medium text-gray-700 mb-2">Basic Details</h4>
@@ -147,7 +147,7 @@
                                 </div>
                             </dl>
                         </div>
-                        
+
                         <div>
                             <h4 class="font-medium text-gray-700 mb-2">Pricing</h4>
                             <dl class="space-y-2">
@@ -162,7 +162,7 @@
                                 <div class="flex justify-between">
                                     <dt class="text-gray-600">Status:</dt>
                                     <dd class="font-medium">
-                                        <span class="px-2 py-1 text-xs rounded-full 
+                                        <span class="px-2 py-1 text-xs rounded-full
                                             {{ $hostel->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                             {{ $hostel->is_approved ? 'Approved' : 'Pending Approval' }}
                                         </span>
@@ -186,7 +186,7 @@
                                 <p class="text-sm text-red-600">All hostel details, images, and descriptions</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-start">
                             <svg class="w-5 h-5 text-red-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -196,7 +196,7 @@
                                 <p class="text-sm text-red-600">All current and pending bookings for this hostel</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-start">
                             <svg class="w-5 h-5 text-red-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
@@ -206,7 +206,7 @@
                                 <p class="text-sm text-red-600">All student reviews and ratings for this hostel</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-start">
                             <svg class="w-5 h-5 text-red-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
@@ -224,12 +224,12 @@
                     <form action="{{ route('landlord.hostels.destroy', $hostel->id) }}" method="POST" id="delete-form">
                         @csrf
                         @method('DELETE')
-                        
+
                         <div class="mb-6">
                             <label for="confirmation" class="block text-sm font-medium text-gray-700 mb-2">
                                 Type <strong>"DELETE"</strong> to confirm:
                             </label>
-                            <input type="text" name="confirmation" id="confirmation" 
+                            <input type="text" name="confirmation" id="confirmation"
                                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-red-500 focus:border-red-500 uppercase"
                                    placeholder="Type DELETE here"
                                    required
@@ -239,11 +239,11 @@
                         </div>
 
                         <div class="flex justify-between items-center">
-                            <a href="{{ route('landlord.hostels') }}" 
+                            <a href="{{ route('landlord.hostels') }}"
                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg">
                                 Cancel
                             </a>
-                            <button type="submit" 
+                            <button type="submit"
                                     id="delete-btn"
                                     disabled
                                     class="bg-red-600 hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg flex items-center">
@@ -261,7 +261,7 @@
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-blue-900 mb-2">💡 Consider These Alternatives</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <a href="{{ route('landlord.hostels.edit', $hostel->id) }}" 
+                    <a href="{{ route('landlord.hostels.edit', $hostel->id) }}"
                        class="bg-white hover:bg-gray-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg flex items-center">
                         <svg class="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -271,11 +271,11 @@
                             <p class="text-sm text-blue-600">Update information instead of deleting</p>
                         </div>
                     </a>
-                    
+
                     <form action="{{ route('landlord.hostels.toggle-availability', $hostel->id) }}" method="POST" class="inline">
                         @csrf
                         @method('PATCH')
-                        <button type="submit" 
+                        <button type="submit"
                                 class="w-full bg-white hover:bg-gray-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg flex items-center text-left">
                             <svg class="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -300,7 +300,7 @@
                 alert('Please type "DELETE" in uppercase to confirm deletion.');
                 return false;
             }
-            
+
             if (!confirm('Are you absolutely sure? This action cannot be undone!')) {
                 e.preventDefault();
                 return false;

@@ -155,5 +155,11 @@ return [
             // 'window' => 0,
         ]),
     ],
+    'redirects' => [
+    'login' => '/dashboard',
+    'logout' => '/',
+    'password-confirm' => '/dashboard',
+    'register' => '/approval-pending', // Redirect to approval pending after registration
+],
 
 ];

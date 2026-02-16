@@ -18,6 +18,6 @@ class StudentMiddleware
             return $next($request);
         }
 
-        return redirect('/dashboard')->with('error', 'Access denied. Student access only.');
+        return redirect()->back()->with('error', 'Access denied. Student access only.');
     }
 }

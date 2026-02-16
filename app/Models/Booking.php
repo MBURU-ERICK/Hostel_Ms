@@ -48,6 +48,35 @@ public function student()
 {
     return $this->belongsTo(User::class, 'user_id');
 }
+ public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Get the latest payment for the booking.
+     */
+    public function latestPayment()
+    {
+        return $this->hasOne(Payment::class)->latest();
+    }
+
+    /**
+     * Check if booking has been paid for
+     */
+    public function isPaid(): bool
+    {
+        return $this->payment_status === 'paid';
+    }
+
+    /**
+     * Check if booking payment is pending
+     */
+    public function isPaymentPending(): bool
+    {
+        return $this->payment_status === 'pending';
+    }
+
 
     // Calculate total amount based on duration
     public function calculateTotalAmount()

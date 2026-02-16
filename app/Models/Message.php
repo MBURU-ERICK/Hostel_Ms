@@ -10,11 +10,14 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
-        'booking_id',
+        'conversation_id',
         'sender_id',
         'receiver_id',
+        'booking_id',
         'message',
-        'is_read'
+        'message_type',
+        'is_read',
+        'attachment'
     ];
 
     protected $casts = [
@@ -23,11 +26,7 @@ class Message extends Model
         'updated_at' => 'datetime'
     ];
 
-    public function booking()
-    {
-        return $this->belongsTo(Booking::class);
-    }
-
+    // Relationships
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
@@ -38,13 +37,49 @@ class Message extends Model
         return $this->belongsTo(User::class, 'receiver_id');
     }
 
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
+
+    // Scopes
+    public function scopeUnread($query)
+    {
+        return $query->where('is_read', false);
+    }
+
+    public function scopeBetweenUsers($query, $user1, $user2)
+    {
+        return $query->where(function($q) use ($user1, $user2) {
+            $q->where('sender_id', $user1)->where('receiver_id', $user2);
+        })->orWhere(function($q) use ($user1, $user2) {
+            $q->where('sender_id', $user2)->where('receiver_id', $user1);
+        });
+    }
+
+    public function scopeRecent($query, $days = 30)
+    {
+        return $query->where('created_at', '>=', now()->subDays($days));
+    }
+
+    // Methods
     public function markAsRead()
     {
         $this->update(['is_read' => true]);
     }
 
-    public function scopeUnread($query)
+    public function isFromUser(User $user): bool
     {
-        return $query->where('is_read', false);
+        return $this->sender_id === $user->id;
+    }
+
+    public function isToUser(User $user): bool
+    {
+        return $this->receiver_id === $user->id;
     }
 }

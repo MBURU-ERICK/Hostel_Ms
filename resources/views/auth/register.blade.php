@@ -18,6 +18,12 @@
         body {
             font-family: 'Figtree', sans-serif;
         }
+        .form-section {
+            display: none;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -36,7 +42,7 @@
                     Create your account
                 </h2>
                 <p class="mt-2 text-center text-sm text-gray-600">
-                    Choose your account type to get started
+                    Join our platform in just a few steps
                 </p>
             </div>
 
@@ -69,106 +75,95 @@
                 @csrf
 
                 <div class="space-y-4">
+                    <!-- User Type Dropdown -->
+                    <div>
+                        <label for="user_type" class="block text-sm font-medium text-gray-700">Account Type</label>
+                        <select id="user_type" name="user_type" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-300"
+                            onchange="handleUserTypeChange()">
+                            <option value="">Select Account Type</option>
+                            <option value="student" {{ old('user_type') == 'student' ? 'selected' : '' }}>🎓 Student</option>
+                            <option value="landlord" {{ old('user_type') == 'landlord' ? 'selected' : '' }}>🏠 Landlord</option>
+                            <option value="service_provider" {{ old('user_type') == 'service_provider' ? 'selected' : '' }}>🔧 Service Provider</option>
+                        </select>
+                        <p id="user_type_description" class="mt-1 text-xs text-gray-500">
+                            Please select your account type to continue
+                        </p>
+                    </div>
+
                     <!-- Name -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
                         <input id="name" name="name" type="text" required value="{{ old('name') }}"
-                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
+                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-300"
+                            placeholder="Enter your full name">
                     </div>
 
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
                         <input id="email" name="email" type="email" required value="{{ old('email') }}"
-                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
+                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-300"
+                            placeholder="Enter your email address">
                     </div>
 
                     <!-- Phone -->
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
                         <input id="phone" name="phone" type="text" required value="{{ old('phone') }}"
-                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
+                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-300"
+                            placeholder="e.g., 0712345678">
                     </div>
 
-                    <!-- User Type -->
-                    <div>
-                        <label for="user_type" class="block text-sm font-medium text-gray-700">Account Type</label>
-                        <select id="user_type" name="user_type" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                            <option value="">Select Account Type</option>
-                            <option value="student" {{ old('user_type') == 'student' ? 'selected' : '' }}>Student</option>
-                            <option value="landlord" {{ old('user_type') == 'landlord' ? 'selected' : '' }}>Landlord</option>
-                            <option value="service_provider" {{ old('user_type') == 'service_provider' ? 'selected' : '' }}>Service Provider</option>
-                        </select>
-                    </div>
-
-                    <!-- Student Specific Fields -->
-                    <div id="student_fields" style="display: none;" class="space-y-4 border-t pt-4 mt-4">
-                        <div>
-                            <label for="admission_number" class="block text-sm font-medium text-gray-700">Admission Number</label>
-                            <input id="admission_number" name="admission_number" type="text" value="{{ old('admission_number') }}"
-                                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
-                        </div>
-
-                        <div>
-                            <label for="id_number" class="block text-sm font-medium text-gray-700">ID Number</label>
-                            <input id="id_number" name="id_number" type="text" value="{{ old('id_number') }}"
-                                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
-                        </div>
-
-                        <div>
-                            <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
-                            <select id="gender" name="gender"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
-                                <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="institution_name" class="block text-sm font-medium text-gray-700">Institution Name</label>
-                            <input id="institution_name" name="institution_name" type="text" value="{{ old('institution_name') }}"
-                                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
-                        </div>
-
-                        <div>
-                            <label for="course" class="block text-sm font-medium text-gray-700">Course</label>
-                            <input id="course" name="course" type="text" value="{{ old('course') }}"
-                                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
-                        </div>
-
-                        <div>
-                            <label for="year_of_study" class="block text-sm font-medium text-gray-700">Year of Study</label>
-                            <input id="year_of_study" name="year_of_study" type="text" value="{{ old('year_of_study') }}"
-                                class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
-                        </div>
+                    <!-- ID Number Field (for landlords and service providers) -->
+                    <div id="id_number_field" style="display: none;">
+                        <label for="id_number" class="block text-sm font-medium text-gray-700">ID Number <span class="text-red-500">*</span></label>
+                        <input id="id_number" name="id_number" type="text" value="{{ old('id_number') }}"
+                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-300"
+                            placeholder="Enter your national ID number">
+                        <p class="mt-1 text-xs text-gray-500">Required for landlord and service provider verification</p>
                     </div>
 
                     <!-- Password -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                         <input id="password" name="password" type="password" required
-                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
+                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-300"
+                            placeholder="Create a strong password">
                     </div>
 
                     <!-- Confirm Password -->
                     <div>
                         <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
                         <input id="password_confirmation" name="password_confirmation" type="password" required
-                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
+                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-300"
+                            placeholder="Confirm your password">
                     </div>
+                </div>
+
+                <!-- Account Type Information -->
+                <div id="account_info" class="bg-blue-50 border border-blue-200 rounded-lg p-4" style="display: none;">
+                    <h3 class="text-sm font-medium text-blue-800 mb-2" id="account_title">Account Information</h3>
+                    <p class="text-xs text-blue-700" id="account_description">
+                        Please fill in all the required information for your selected account type.
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1" id="approval_info"></p>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="text-xs text-gray-600">
+                    <p>By creating an account, you agree to our <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>.</p>
                 </div>
 
                 <div class="flex items-center justify-between">
                     <div class="text-sm">
                         <a href="{{ route('login') }}" class="font-medium text-blue-600 hover:text-blue-500">
-                            Already have an account?
+                            Already have an account? Sign in
                         </a>
                     </div>
 
                     <button type="submit"
-                        class="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        class="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
                         Create Account
                     </button>
                 </div>
@@ -177,29 +172,96 @@
     </div>
 
     <script>
-        document.getElementById('user_type').addEventListener('change', function() {
-            const studentFields = document.getElementById('student_fields');
-            const studentInputs = studentFields.querySelectorAll('input, select');
+        function handleUserTypeChange() {
+            const userType = document.getElementById('user_type').value;
+            const idNumberField = document.getElementById('id_number_field');
+            const idNumberInput = document.getElementById('id_number');
+            const accountInfo = document.getElementById('account_info');
+            const accountTitle = document.getElementById('account_title');
+            const accountDescription = document.getElementById('account_description');
+            const approvalInfo = document.getElementById('approval_info');
+            const userTypeDescription = document.getElementById('user_type_description');
 
-            if (this.value === 'student') {
-                studentFields.style.display = 'block';
-                studentInputs.forEach(field => {
-                    field.required = true;
-                });
-            } else {
-                studentFields.style.display = 'none';
-                studentInputs.forEach(field => {
-                    field.required = false;
-                });
+            // Reset all fields first
+            idNumberField.style.display = 'none';
+            idNumberInput.required = false;
+            accountInfo.style.display = 'none';
+
+            if (userType === '') {
+                userTypeDescription.textContent = 'Please select your account type to continue';
+                return;
             }
-        });
 
-        // Trigger change on page load for validation errors
+            // Show account info based on user type
+            accountInfo.style.display = 'block';
+
+            if (userType === 'student') {
+                accountTitle.textContent = '🎓 Student Account';
+                accountDescription.textContent = 'Find hostels, book accommodation, and access student services. Perfect for students looking for comfortable and affordable housing.';
+                approvalInfo.textContent = '✅ Student accounts are activated immediately after registration.';
+                userTypeDescription.textContent = 'Ideal for students seeking accommodation near their educational institutions';
+
+                // Hide ID number field for students
+                idNumberField.style.display = 'none';
+                idNumberInput.required = false;
+
+            } else if (userType === 'landlord') {
+                accountTitle.textContent = '🏠 Landlord Account';
+                accountDescription.textContent = 'List and manage your hostels, connect with students, and handle bookings efficiently.';
+                approvalInfo.textContent = '⏳ Landlord accounts require admin approval. You will be notified once your account is activated.';
+                userTypeDescription.textContent = 'For property owners who want to list and manage their hostels';
+
+                // Show ID number field for landlords
+                idNumberField.style.display = 'block';
+                idNumberInput.required = true;
+
+            } else if (userType === 'service_provider') {
+                accountTitle.textContent = '🔧 Service Provider Account';
+                accountDescription.textContent = 'Offer maintenance and other services to hostels. Connect with landlords and students for service requests.';
+                approvalInfo.textContent = '⏳ Service Provider accounts require admin approval. You will be notified once your account is activated.';
+                userTypeDescription.textContent = 'For professionals offering maintenance and other services to hostels';
+
+                // Show ID number field for service providers
+                idNumberField.style.display = 'block';
+                idNumberInput.required = true;
+            }
+        }
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             const userType = document.getElementById('user_type');
-            if (userType.value === 'student') {
-                userType.dispatchEvent(new Event('change'));
+
+            // Trigger change event if a value is already selected (e.g., from validation errors)
+            if (userType.value) {
+                handleUserTypeChange();
             }
+
+            // Add smooth transitions for better UX
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.classList.add('ring-2', 'ring-blue-500', 'border-blue-500');
+                });
+
+                input.addEventListener('blur', function() {
+                    this.classList.remove('ring-2', 'ring-blue-500', 'border-blue-500');
+                });
+            });
+        });
+
+        // Form validation enhancement
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const userType = document.getElementById('user_type').value;
+            const idNumberInput = document.getElementById('id_number');
+
+            if ((userType === 'landlord' || userType === 'service_provider') && !idNumberInput.value.trim()) {
+                e.preventDefault();
+                alert('Please provide your ID number for verification.');
+                idNumberInput.focus();
+                return false;
+            }
+
+            return true;
         });
     </script>
 </body>

@@ -4,6 +4,10 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Mail\AccountApprovedMail;
+use App\Mail\RegistrationConfirmationMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class NotificationService
 {
@@ -20,6 +24,10 @@ class NotificationService
             'data' => $data,
         ]);
     }
+    public static function createNotification($userId, $type, $title, $message, $data = null)
+{
+    return self::create($userId, $type, $title, $message, $data);
+}
 
     /**
      * Notify student about booking creation
@@ -149,4 +157,67 @@ public static function notifyBookingCancelled($booking)
                           ->orderBy('created_at', 'desc')
                           ->paginate($perPage);
     }
+    public static function sendRegistrationConfirmation(User $user)
+    {
+        try {
+            Mail::to($user->email)->send(new RegistrationConfirmationMail($user));
+
+            Log::info('Registration confirmation email sent', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'user_type' => $user->user_type
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to send registration confirmation email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Send account approval email
+     */
+    public static function sendAccountApproval(User $user)
+    {
+        try {
+            Mail::to($user->email)->send(new AccountApprovedMail($user));
+
+            Log::info('Account approval email sent', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'user_type' => $user->user_type
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to send account approval email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Send bulk approval notifications
+     */
+    public static function sendBulkApprovalNotifications(array $userIds)
+    {
+        $users = User::whereIn('id', $userIds)->get();
+        $results = [];
+
+        foreach ($users as $user) {
+            $results[$user->id] = self::sendAccountApproval($user);
+        }
+
+        return $results;
+    }
+
+
 }
